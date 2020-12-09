@@ -70,3 +70,182 @@ div div div p:first-letter {
 .cardborder{
     border: dashed 2px rgb(255, 92, 92);
 }
+
+.botonTabla{
+    display: flex;
+    justify-content: center;
+    margin: 1%;
+}
+
+.botonesModal{
+    display: flex;
+    justify-content: space-evenly;
+    margin: 2%;
+}
+
+.botonesTabla:hover{
+    cursor: pointer;
+}
+/* Modal */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.6);
+}
+
+.recuadro {
+    width: 50%;
+    height: auto;
+}
+.card-total {
+    margin: auto;
+    background-color: white;
+    color: black;
+    width: 100%;
+}
+
+.items {
+    overflow-y: auto;
+    height: 100px;
+    margin-bottom: 1rem;
+}
+
+.display-none {
+    display: none;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.bordesRecuadro {
+    border: solid 6px rgb(255, 92, 92);
+    border-radius: 3%;
+}
+
+/* Animacion de la progress bar*/
+.inicio{
+    width: 0%;
+}
+
+.transicion{
+    transition: width 2s;
+}
+
+.final{
+    width: 100%;
+}
+
+.margenFiltro{
+    margin: 4%;
+    margin-left: 30%;
+}
+
+/* Estilo para el switch on/off */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  /* The slider */
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+ 
+  .contenedorFiltro{
+      display: flex;
+      justify-content: left;
+      margin-left: 1%;
+  }
+
+  /* clases para el select del filtro */
+  .caja {
+    margin:20px auto 40px auto;	
+    border:1px solid #d9d9d9;
+    height:30px;
+    overflow: hidden;
+    width: 230px;
+    position:relative;
+ }
+ select {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    height: 30px;
+    padding: 5px;
+    width: 250px;
+ }
+ select:focus{ outline: none;}
+ 
+ .caja::after{
+     content:"\025be";
+     display:table-cell;
+     padding-top:7px;
+     text-align:center;
+     width:30px;
+     height:30px;
+     background-color:#d9d9d9;
+     position:absolute;
+     top:0;
+     right:0px;	
+     pointer-events: none;
+ }
