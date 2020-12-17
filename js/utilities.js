@@ -27,28 +27,33 @@ function limpiarTabla(){
 //creamos el contenido de la  tabla:
 let crearTabla=(baterias)=>{
     let listaDatos= document.createElement("tr");
-for (const lista in baterias) {
-    let listItem=document.createElement("td");
-    listItem.innerHTML= baterias[lista];
-    listaDatos.appendChild(listItem);
-    body.appendChild(listaDatos)
-}
-tableEl.appendChild(body);
+    for (const lista in baterias) {
+        let listItem=document.createElement("td");
+        listItem.innerHTML= baterias[lista];
+        listaDatos.appendChild(listItem);
+     body.appendChild(listaDatos)
+    }
+    tableEl.appendChild(body);
 
-// celda con boton de editar
-let botonEditar=document.createElement("td");
-botonEditar.innerHTML= "<img src='../Assets/Img/Icono editar-eliminar/pencil-square.svg' alt='editar' width='32' height='32'/>";
-botonEditar.classList.add("botonesTabla");
+    // celda con boton de editar
+    let botonEditar=document.createElement("td");
+    let imagenEditar=document.createElement("img");
+    imagenEditar.src="../Assets/Img/Icono editar-eliminar/pencil-square.svg";
+    imagenEditar.alt="Editar esta línea";
+    imagenEditar.classList.add("botonesTabla");
+    botonEditar.appendChild(imagenEditar);
     listaDatos.appendChild(botonEditar);
-    botonEditar.addEventListener("click",(event)=>{event.preventDefault();showModalEditar(event.path[2])});
+    imagenEditar.addEventListener("click",(event)=>{event.preventDefault();showModalEditar(event.path[2])});
 
-//celda con boton de eliminar
-let botonEliminar=document.createElement("td");
-botonEliminar.innerHTML= "<img src='../Assets/Img/Icono editar-eliminar/trash-fill.svg' alt='eliminar' width='32' height='34'/>";
-botonEliminar.classList.add("botonesTabla");
+    //celda con boton de eliminar
+    let botonEliminar=document.createElement("td");
+    let imagenEliminar=document.createElement("img");
+    imagenEliminar.src="../Assets/Img/Icono editar-eliminar/trash-fill.svg";
+    imagenEliminar.alt="Eliminar esta línea";
+    imagenEliminar.classList.add("botonesTabla");
+    botonEliminar.appendChild(imagenEliminar);
     listaDatos.appendChild(botonEliminar);
-    botonEliminar.addEventListener("click",(event)=>{event.preventDefault();showModalEliminar(event.path[2])});
-    botonEliminar.removeEventListener("click",(event)=>{event.preventDefault();showModalEliminar(event.path[2])},true);
+    imagenEliminar.addEventListener("click",(event)=>{event.preventDefault();showModalEliminar(event.path[2])});
 
 }
 
@@ -78,11 +83,20 @@ function showModalEliminar(fila) {
 function eliminarDato (fila) {
     cancelar.removeEventListener("click",cancelarModal, { once: true });
     progressBar.classList.add('final');
-  setTimeout(()=>{
-    overlayEl.classList.add('display-none');
-    progressBar.classList.remove('final');
-    body.removeChild(fila);
-    },1000);
+    setTimeout(()=>{
+        overlayEl.classList.add('display-none');
+        progressBar.classList.remove('final');
+        body.removeChild(fila);
+        //Tambien eliminamos los datos del arreglo original 
+        //(para encontrar el elemento busco por el modelo de la bateria, entendiendo que cada modelo es único.
+        //En caso de una base de datos distinta tendria que agregar un id de cada producto para poder identificarlos).
+        let eliminarBateriaModelo=fila.cells[1].innerHTML;
+        //console.log(eliminarBateriaModelo);
+        let resultado= processedData.findIndex(bateria=>bateria.Modelo==eliminarBateriaModelo);
+        //console.log(resultado);
+        processedData.splice(resultado,1);
+        //console.log(processedData);
+    },2000);
 }
 
 // funcion cancelar
@@ -91,55 +105,82 @@ function cancelarModal() {
     aceptar.removeEventListener("click",()=>{eliminarDato(fila)},{ once: true });
 }
 
-// Se muestra el modal cuando se quiere EDITAR fila */
+// Se muestra el modal cuando se quiere EDITAR fila 
 function showModalEditar(fila) {
     titulo.innerHTML= "Editar";
     mensaje.innerHTML= "Modifique los datos:";
     let formulario=document.createElement("form");
-    formulario.classList.add('container', 'padding', 'margen');
+    formulario.classList.add('padding', 'margen', 'col-form-label');
     mensaje.appendChild(formulario);
     // se crean los input dinamicamente
          let marca=document.createElement("INPUT");
          marca.setAttribute("type", "text");
-         marca.setAttribute("required", "true"); //ver el tema del required!
+         marca.setAttribute('required','true');
          marca.value=fila.cells[0].innerHTML;
          marca.classList.add('margen');
          formulario.appendChild(marca);
          let modelo=document.createElement("INPUT");
          modelo.setAttribute("type", "text");
+         modelo.setAttribute('required','true');
          modelo.value=fila.cells[1].innerHTML;
          modelo.classList.add('margen');
          formulario.appendChild(modelo);
          let voltaje=document.createElement("INPUT");
          voltaje.setAttribute("type", "number");
+         voltaje.setAttribute('required','true');
          voltaje.value=fila.cells[2].innerHTML;
          voltaje.classList.add('margen');
          formulario.appendChild(voltaje);
          let amperaje=document.createElement("INPUT");
          amperaje.setAttribute("type", "text");
+         amperaje.setAttribute('required','true');
          amperaje.value=fila.cells[3].innerHTML;
          amperaje.classList.add('margen');
          formulario.appendChild(amperaje);
     aceptar.innerHTML= "Aceptar";
     cancelar.innerHTML= "Cancelar";
     overlayEl.classList.remove('display-none');
-    //aceptar.addEventListener("click",()=>{modificarDato (fila,marca,modelo,voltaje,amperaje)}, { once: true });
-    aceptar.onclick=function(){modificarDato (fila,marca,modelo,voltaje,amperaje)};
+    aceptar.onclick=function(){validarFormulario(fila,marca,modelo,voltaje,amperaje)};
     cancelar.addEventListener("click",()=>overlayEl.classList.add('display-none'), { once: true });
 }
+//funcion que valida el formulario de Editar
+function validarFormulario(fila,marca,modelo,voltaje,amperaje) { 
+    if ((marca.value.trim()=="") || (modelo.value.trim()=="")|| (voltaje.value.trim()=="")|| (amperaje.value.trim()==""))
+    {
+        mensajeAlerta.classList.remove('hidden');
+    }
+    else {
+    modificarDato (fila,marca,modelo,voltaje,amperaje)
+    mensajeAlerta.classList.add('hidden');
+    }
+};
+
 // funcion que modifica el dato en la tabla
 function modificarDato (fila,marca,modelo,voltaje,amperaje) {
     progressBar.classList.add('final');
 
   setTimeout(()=>{
+    //Tambien editamos los datos del arreglo original 
+    //(para encontrar el elemento busco por el modelo de la bateria, entendiendo que cada modelo es único.
+    //En caso de una base de datos distinta tendria que agregar un id de cada producto para poder identificarlos).
+    let editarBateriaModelo=fila.cells[1].innerHTML;
+    // console.log(editarBateriaModelo);
+    let resultadoEditado= processedData.findIndex(bateria=>bateria.Modelo==editarBateriaModelo);
+    // console.log(resultadoEditado);
+    processedData[resultadoEditado].Marca=marca.value;
+    processedData[resultadoEditado].Modelo=modelo.value;
+    processedData[resultadoEditado].Voltaje=voltaje.value;
+    processedData[resultadoEditado].Amperaje=amperaje.value;
+    // console.log(processedData);
+    // editamos la tabla
     overlayEl.classList.add('display-none');
     progressBar.classList.remove('final');
     fila.cells[0].innerHTML=marca.value;
     fila.cells[1].innerHTML=modelo.value;
     fila.cells[2].innerHTML=voltaje.value;
     fila.cells[3].innerHTML=amperaje.value;
-  },2000);   
-}
+    },2000);   
+};
 
 
 // Se muestra el modal cuando se quiere AGREGAR fila */
@@ -147,36 +188,52 @@ function showModalAgregar() {
     titulo.innerHTML= "Agregar";
     mensaje.innerHTML= "Inserte datos:";
     let formulario=document.createElement("form");
-    formulario.classList.add('container', 'padding', 'margen');
+    formulario.classList.add('padding', 'margen');
     mensaje.appendChild(formulario);
     // se crean los input dinamicamente
          let marca=document.createElement("INPUT");
          marca.setAttribute("type", "text");
          marca.placeholder='Marca';
          marca.classList.add('margen');
+         marca.setAttribute('required','true');
          formulario.appendChild(marca);
          let modelo=document.createElement("INPUT");
          modelo.setAttribute("type", "text");
+         modelo.setAttribute('required','true');
          modelo.placeholder='Modelo';
          modelo.classList.add('margen');
          formulario.appendChild(modelo);
          let voltaje=document.createElement("INPUT");
          voltaje.setAttribute("type", "number");
+         voltaje.setAttribute('required','true');
          voltaje.placeholder='Voltaje';
          voltaje.classList.add('margen');
          formulario.appendChild(voltaje);
          let amperaje=document.createElement("INPUT");
          amperaje.setAttribute("type", "text");
+         amperaje.setAttribute('required','true');
          amperaje.placeholder='Amperaje';
          amperaje.classList.add('margen');
          formulario.appendChild(amperaje);
     aceptar.innerHTML= "Aceptar";
     cancelar.innerHTML= "Cancelar";
     overlayEl.classList.remove('display-none');
-    //aceptar.addEventListener("click",()=>{insertarDato (marca,modelo,voltaje,amperaje)}, { once: true });
-    aceptar.onclick=function(){insertarDato (marca,modelo,voltaje,amperaje)};
+    aceptar.onclick=function(){validarFormularioAgregar (marca,modelo,voltaje,amperaje)};
     cancelar.addEventListener("click",()=>overlayEl.classList.add('display-none'), { once: true }); 
 }
+
+//funcion que valida el formulario de Agregar
+function validarFormularioAgregar(marca,modelo,voltaje,amperaje) { 
+    if ((marca.value.trim()=="") || (modelo.value.trim()=="")|| (voltaje.value.trim()=="")|| (amperaje.value.trim()==""))
+    {
+        mensajeAlerta.classList.remove('hidden');
+    }
+    else {
+        insertarDato (marca,modelo,voltaje,amperaje)
+    mensajeAlerta.classList.add('hidden');
+    }
+};
+
 
 // funcion que inserta el dato nuevo en la tabla
 function insertarDato (marca,modelo,voltaje,amperaje) {
@@ -184,42 +241,43 @@ function insertarDato (marca,modelo,voltaje,amperaje) {
     setTimeout(()=>{
       overlayEl.classList.add('display-none');
       progressBar.classList.remove('final');
-    nuevaBateria.Marca=marca.value;
-    nuevaBateria.Modelo=modelo.value;
-    nuevaBateria.Voltaje=voltaje.value;
-    nuevaBateria.Amperaje=amperaje.value;
-    crearTabla(nuevaBateria);
-  },2000);   
+      nuevaBateria.Marca=marca.value;
+      nuevaBateria.Modelo=modelo.value;
+      nuevaBateria.Voltaje=voltaje.value;
+      nuevaBateria.Amperaje=amperaje.value;
+      crearTabla(nuevaBateria);
+      // tambien insertamos el dato nuevo en el arreglo de objetos orginal
+          processedData.push(nuevaBateria);
+          nuevaBateria=[];
+          //console.log(nuevaBateria);
+    },2000);   
 }
 
 // funcion que carga los dropdowns del filtro
 function cargarOpcionesFiltro(){
-let opciones= new Set(processedData.baterias.map(elem=>{return elem.Marca}));
-console.log(processedData.baterias);
-
-filtroEl.innerHTML='';
-let opcionEl=document.createElement('option');
-opcionEl.value='';
-opcionEl.innerHTML='Filtrar por marca';
-//<option value="" disabled selected>Choose your option</option>
-opcionEl.setAttribute('disabled','true');
-opcionEl.setAttribute('selected','true');
-filtroEl.appendChild(opcionEl);
-//<option value="Elija una opción" selected>Filtrar por tipo</option>
-opciones.forEach(elem=>{
-  let opcionEl=document.createElement('option');
-  opcionEl.value=elem;
-  opcionEl.innerText=elem;
-  filtroEl.appendChild(opcionEl);
-})
-console.log(opciones);
+    let opciones= new Set(processedData.map(elem=>{return elem.Marca}));
+    //console.log(processedData);
+    filtroEl.innerHTML='';
+    let opcionEl=document.createElement('option');
+    opcionEl.value='';
+    opcionEl.innerHTML='Filtrar por marca';
+    opcionEl.setAttribute('disabled','true');
+    opcionEl.setAttribute('selected','true');
+    filtroEl.appendChild(opcionEl);
+    opciones.forEach(elem=>{
+        let opcionEl=document.createElement('option');
+        opcionEl.value=elem;
+        opcionEl.innerText=elem;
+        filtroEl.appendChild(opcionEl);
+    })
+    //console.log(opciones);
 }
 
-
+//funcion de filtrado por Marcas
 filtroEl.addEventListener('change', ()=>{
     limpiarTabla();
-let datosFiltrados=processedData.baterias.filter(elem=>{return elem.Marca==filtroEl.value});
-for (let i=0; i< datosFiltrados.length; i++)
-{
-    crearTabla(datosFiltrados[i]);   
-}})
+    let datosFiltrados=processedData.filter(elem=>{return elem.Marca==filtroEl.value});
+    for (let i=0; i< datosFiltrados.length; i++)
+    {crearTabla(datosFiltrados[i])}
+}
+)
